@@ -1,0 +1,18 @@
+Player = function(game, canvas) {
+    // La scène du jeu
+    this.scene = game.scene;
+
+    // Initialisation de la caméra
+    this._initCamera(this.scene, canvas);
+
+};
+
+Player.prototype = {
+    _initCamera : function(scene, canvas) {
+        // On crée la caméra
+        this.camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 1, 0.8, 10, new BABYLON.Vector3(0, 0, 0), scene);
+
+        // On affecte le mouvement de la caméra au canvas
+        this.camera.attachControl(canvas, true);
+    }
+};
