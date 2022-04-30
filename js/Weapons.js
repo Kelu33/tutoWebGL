@@ -12,7 +12,7 @@ Weapons = function(Player) {
     this.rocketLauncher = this.newWeapon(Player);
 
     // Cadence de tir
-	this.fireRate = 800;
+	this.fireRate = 100;
 
 	// Delta de calcul pour savoir quand le tir est a nouveau disponible
 	this._deltaFireRate = this.fireRate;
@@ -72,23 +72,19 @@ Weapons.prototype = {
 	},
 	launchFire : function() {
 	    if (this.canFire) {
-	        var renderWidth = this.Player.game.engine.getRenderWidth(true);
-	        var renderHeight = this.Player.game.engine.getRenderHeight(true);
-	        
-	        var direction = this.Player.game.scene.pick(renderWidth/2,renderHeight/2);
-	        direction = direction.pickedPoint.subtractInPlace(this.Player.camera.position);
-	        direction = direction.normalize();
-
-	        this.createRocket(this.Player.camera,direction)
-	        this.canFire = false; 
+			// console.log('Pew !');
+			
+			this.createRocket(this.Player.camera.playerBox)
+			this.canFire = false;
 	    } else {
 	        // Nothing to do : cannot fire
 	    }
 	},
 	createRocket : function(playerPosition, direction) {
-	    var positionValue = this.rocketLauncher.absolutePosition.clone();
-	    var rotationValue = playerPosition.rotation; 
-	    var newRocket = BABYLON.Mesh.CreateBox("rocket", 1, this.Player.game.scene);
+		var positionValue = this.rocketLauncher.absolutePosition.clone();
+		var rotationValue = playerPosition.rotation; 
+		var Player = this.Player;
+		var newRocket = BABYLON.Mesh.CreateBox("rocket", 1, Player.game.scene);
 	    newRocket.direction = new BABYLON.Vector3(
 	        Math.sin(rotationValue.y) * Math.cos(rotationValue.x),
 	        Math.sin(-rotationValue.x),
@@ -110,7 +106,7 @@ Weapons.prototype = {
 
 	    newRocket.registerAfterRender(function(){
 		    // On bouge la roquette vers l'avant
-		    newRocket.translate(new BABYLON.Vector3(0,0,1),1,0);
+		    newRocket.translate(new BABYLON.Vector3(0,0,1),10,0);
 		    
 		    // On crée un rayon qui part de la base de la roquette vers l'avant
 		    var rayRocket = new BABYLON.Ray(newRocket.position,newRocket.direction);
@@ -123,7 +119,7 @@ Weapons.prototype = {
 			    // On vérifie qu'on a bien touché quelque chose
 			    if(meshFound.pickedMesh){
 			        // On crée une sphere qui représentera la zone d'impact
-			        var explosionRadius = BABYLON.Mesh.CreateSphere("sphere", 5.0, 20, Player.game.scene);
+			        var explosionRadius = BABYLON.Mesh.CreateSphere("sphere", 5.0, 2, Player.game.scene);
 			        // On positionne la sphère la ou il y a eu impact
 			        explosionRadius.position = meshFound.pickedPoint;
 			        // On fais en sorte que les explosions ne soit pas considéré pour le Ray de la roquette
@@ -138,11 +134,11 @@ Weapons.prototype = {
 			        explosionRadius.registerAfterRender(function(){
 			            explosionRadius.material.alpha -= 0.02;
 			            if(explosionRadius.material.alpha<=0){
-			                explosionRadius.dispose();
+			                // explosionRadius.dispose();
 			            }
 			        });
 			    }
-			    newRocket.dispose();
+			    // newRocket.dispose();
 			}
 		});
 	},
